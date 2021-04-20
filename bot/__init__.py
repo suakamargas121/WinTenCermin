@@ -6,6 +6,7 @@ import time
 import aria2p
 import telegram.ext as tg
 from dotenv import load_dotenv
+from pyrogram import Client
 import socket
 import faulthandler
 faulthandler.enable()
@@ -71,7 +72,7 @@ try:
     parent_id = getConfig('GDRIVE_FOLDER_ID')
     telegraph_token = getConfig('TELEGRAPH_TOKEN')
     DOWNLOAD_DIR = getConfig('DOWNLOAD_DIR')
-    if DOWNLOAD_DIR[-1] != '/' or DOWNLOAD_DIR[-1] != '\\':
+    if not DOWNLOAD_DIR.endswith("/"):
         DOWNLOAD_DIR = DOWNLOAD_DIR + '/'
     DOWNLOAD_STATUS_UPDATE_INTERVAL = int(getConfig('DOWNLOAD_STATUS_UPDATE_INTERVAL'))
     OWNER_ID = int(getConfig('OWNER_ID'))
@@ -83,6 +84,8 @@ try:
 except KeyError as e:
     LOGGER.error("One or more env variables missing! Exiting now")
     exit(1)
+
+app = Client(':memory:', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN)
 
 try:
     UPTOBOX_TOKEN = getConfig('UPTOBOX_TOKEN')
@@ -186,6 +189,6 @@ except KeyError:
     SHORTENER = None
     SHORTENER_API = None
 
-updater = tg.Updater(token=BOT_TOKEN,use_context=True)
+updater = tg.Updater(token=BOT_TOKEN)
 bot = updater.bot
 dispatcher = updater.dispatcher
