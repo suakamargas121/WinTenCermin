@@ -7,7 +7,7 @@ from bot.helper.ext_utils.bot_utils import new_thread
 from bot import dispatcher
 
 
-def cloneNode(update,context):
+def cloneNode(update, context):
     if update.message.from_user.last_name:
         last_name = f" {update.message.from_user.last_name}"
     else:
@@ -16,24 +16,25 @@ def cloneNode(update,context):
         username = f"- @{update.message.from_user.username}"
     else:
         username = "-"
-    name = f'<a href="tg://user?id={update.message.from_user.id}">{update.message.from_user.first_name}{last_name}</a>'
+    name = f"<a href='tg://user?id={update.message.from_user.id}'>{update.message.from_user.first_name}{last_name}</a>"
+    msg_user = f"{name} {username} (<code>{update.message.from_user.id}</code>)"
 
-    args = update.message.text.split(" ",maxsplit=1)
+    args = update.message.text.split(" ", maxsplit=1)
     if len(args) > 1:
         link = args[1]
-        msg = f"Cloning..." \
-              f"User: {name} {username} (<code>{update.message.from_user.id}</code>)\n" \
-              f"Message: {update.message.text}"
+        msg = f"User: {msg_user}\nMessage: {update.message.text}"
         sendMessage(msg, context.bot, update)
+        msg = sendMessage(f"Cloning...", context.bot, update)
         gd = GoogleDriveHelper()
         result, button = gd.clone(link)
-        # deleteMessage(context.bot,msg)
+        deleteMessage(context.bot, msg)
         if button == "":
-            sendMessage(result,context.bot,update)
+            sendMessage(result, context.bot, update)
         else:
-            sendMarkup(result,context.bot,update,button)
+            result += f"\n\ncc : {msg_user}"
+            sendMarkup(result, context.bot, update, button)
     else:
-        sendMessage("Provide G-Drive Shareable Link to Clone.",context.bot,update)
+        sendMessage("Provide G-Drive Shareable Link to Clone.", context.bot, update)
 
-clone_handler = CommandHandler(BotCommands.CloneCommand,cloneNode,filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
+clone_handler = CommandHandler(BotCommands.CloneCommand, cloneNode, filters=CustomFilters.authorized_chat | CustomFilters.authorized_user, run_async=True)
 dispatcher.add_handler(clone_handler)
