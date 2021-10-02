@@ -8,18 +8,14 @@ from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no c
 than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
 for original authorship. """
 
-from bot import LOGGER, UPTOBOX_TOKEN
-import json
 import re
-import urllib.parse
-from os import popen
-from random import choice
-
 import requests
+import urllib.parse
+from bot import LOGGER, UPTOBOX_TOKEN
+from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bs4 import BeautifulSoup
 from js2py import EvalJs
-
-from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+from random import choice
 
 
 def direct_link_generator(link: str):
@@ -78,8 +74,7 @@ def yandex_disk(url: str) -> str:
         raise DirectDownloadLinkException("No Yandex.Disk links found")
     api = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={}'
     try:
-        dl_url = requests.get(api.format(link)).json()['href']
-        return dl_url
+        return requests.get(api.format(link)).json()['href']
     except KeyError:
         raise DirectDownloadLinkException("Error: File not found / Download limit reached")
 
@@ -92,8 +87,7 @@ def mediafire(url: str) -> str:
         raise DirectDownloadLinkException("No MediaFire links found")
     page = BeautifulSoup(requests.get(link).content, 'lxml')
     info = page.find('a', {'aria-label': 'Download file'})
-    dl_url = info.get('href')
-    return dl_url
+    return info.get('href')
 
 
 def uptobox(url: str) -> str:
@@ -110,7 +104,7 @@ def uptobox(url: str) -> str:
         try:
             link = re.findall(r'\bhttp?://.*uptobox\.com/dl\S+', url)[0]
             dl_url = link
-        except:
+        except IndexError:
             file_id = re.findall(r'\bhttps?://.*uptobox\.com/(\w+)', url)[0]
             file_link = 'https://uptobox.com/api/link?token=%s&file_code=%s' % (UPTOBOX_TOKEN, file_id)
             req = requests.get(file_link)
@@ -146,8 +140,7 @@ def github(url: str) -> str:
         raise DirectDownloadLinkException("No GitHub Releases links found")
     download = requests.get(url, stream=True, allow_redirects=False)
     try:
-        dl_url = download.headers["location"]
-        return dl_url
+        return download.headers["location"]
     except KeyError:
         raise DirectDownloadLinkException("Error: Can't extract the link")
 
