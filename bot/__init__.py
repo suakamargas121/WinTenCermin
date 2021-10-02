@@ -2,15 +2,14 @@ import logging
 import os
 import threading
 import time
-
 import aria2p
 import telegram.ext as tg
 from dotenv import load_dotenv
 from pyrogram import Client
 import socket
 import faulthandler
-faulthandler.enable()
 
+faulthandler.enable()
 socket.setdefaulttimeout(600)
 
 botStartTime = time.time()
@@ -23,7 +22,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 load_dotenv('config.env')
-
 Interval = []
 
 
@@ -72,7 +70,7 @@ try:
     achats = achats.split(" ")
     for chats in achats:
         AUTHORIZED_CHATS.add(int(chats))
-except:
+except ValueError:
     pass
 
 try:
@@ -89,11 +87,10 @@ try:
     USER_SESSION_STRING = getConfig('USER_SESSION_STRING')
     TELEGRAM_API = getConfig('TELEGRAM_API')
     TELEGRAM_HASH = getConfig('TELEGRAM_HASH')
+    app = Client('WinTenCermin', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN)
 except KeyError as e:
     LOGGER.error("One or more env variables missing! Exiting now")
     exit(1)
-
-app = Client('WinTenCermin', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, bot_token=BOT_TOKEN)
 
 try:
     UPTOBOX_TOKEN = getConfig('UPTOBOX_TOKEN')
@@ -178,7 +175,7 @@ try:
         BLOCK_MEGA_FOLDER = False
 except KeyError:
     BLOCK_MEGA_FOLDER = False
-    
+
 try:
     BLOCK_MEGA_LINKS = getConfig('BLOCK_MEGA_LINKS')
     if BLOCK_MEGA_LINKS.lower() == 'true':
