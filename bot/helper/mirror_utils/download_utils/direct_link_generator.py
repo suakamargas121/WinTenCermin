@@ -30,8 +30,6 @@ def direct_link_generator(link: str):
         return zippy_share(link)
     elif 'yadi.sk' in link:
         return yandex_disk(link)
-    elif 'cloud.mail.ru' in link:
-        return cm_ru(link)
     elif 'mediafire.com' in link:
         return mediafire(link)
     elif 'uptobox.com' in link:
@@ -84,24 +82,6 @@ def yandex_disk(url: str) -> str:
         return dl_url
     except KeyError:
         raise DirectDownloadLinkException("Error: File not found / Download limit reached")
-
-
-def cm_ru(url: str) -> str:
-    """ cloud.mail.ru direct links generator
-    Using https://github.com/JrMasterModelBuilder/cmrudl.py"""
-    try:
-        link = re.findall(r'\bhttps?://.*cloud\.mail\.ru\S+', url)[0]
-    except IndexError:
-        raise DirectDownloadLinkException("No cloud.mail.ru links found")
-    command = f'vendor/cmrudl.py/cmrudl -s {link}'
-    result = popen(command).read()
-    result = result.splitlines()[-1]
-    try:
-        data = json.loads(result)
-    except json.decoder.JSONDecodeError:
-        raise DirectDownloadLinkException("Error: Can't extract the link")
-    dl_url = data['download']
-    return dl_url
 
 
 def mediafire(url: str) -> str:
