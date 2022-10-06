@@ -28,7 +28,7 @@ def direct_link_generator(link: str):
         return yandex_disk(link)
     elif 'mediafire.com' in link:
         return mediafire(link)
-    elif 'uptobox.com' in link:
+    elif 'uptobox.com' in link or 'uptostream.com' in link:
         return uptobox(link)
     elif 'osdn.net' in link:
         return osdn(link)
@@ -94,6 +94,7 @@ def uptobox(url: str) -> str:
     """ Uptobox direct links generator
     based on https://github.com/jovanzers/WinTenCermin """
     try:
+        url = url.replace("uptostream.com", "uptobox.com").replace(".com/iframe/", ".com/")
         link = re.findall(r'\bhttps?://.*uptobox\.com\S+', url)[0]
     except IndexError:
         raise DirectDownloadLinkException("No Uptobox links found")
